@@ -5,7 +5,7 @@
 // @description  statistics for current cluster usage
 // @author       Susanne Sauer
 // @match        http://132.187.77.27/mauires-bin/mauistatus.pl*
-// @updateURL    https://github.com/S0S-90/userscripts/raw/master/ClusterStatistics.user.js
+// @updateURL    https://github.com/S0S-90/userscripts/raw/master/ClusterStatistics.meta.js
 // @downloadURL  https://github.com/S0S-90/userscripts/raw/master/ClusterStatistics.user.js
 // @grant        none
 // ==/UserScript==
