@@ -2,8 +2,8 @@
 
 ## The scripts
 
-* [ClusterStatistics](https://github.com/S0S-90/userscripts/raw/master/ClusterStatistics.js)
-* [removeAnswerBox](https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.js)
+* [ClusterStatistics](https://github.com/S0S-90/userscripts/raw/master/ClusterStatistics.user.js)
+* [removeAnswerBox](https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.user.js)
 
 ## How To Install
 1. Install Tampermonkey (available for Chrome and Firefox)
