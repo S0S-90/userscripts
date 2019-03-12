@@ -1,11 +1,10 @@
 // ==UserScript==
 // @name         ClusterStatistics
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.3
 // @description  statistics for current cluster usage
 // @author       Susanne Sauer
 // @match        http://132.187.77.27/mauires-bin/mauistatus.pl*
-// @grant        none
 // ==/UserScript==
 
 // cuts first 2 lines (headings) and last 4 lines (statistics) from table
