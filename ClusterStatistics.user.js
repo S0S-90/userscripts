@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClusterStatistics
 // @namespace    http://tampermonkey.net/
-// @version      1.01
+// @version      1.0
 // @description  statistics for current cluster usage
 // @author       Susanne Sauer
 // @match        http://132.187.77.27/mauires-bin/mauistatus.pl*
