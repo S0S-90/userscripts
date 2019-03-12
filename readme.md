@@ -7,8 +7,6 @@
 
 ## How To Install
 1. Install Tampermonkey (available for Chrome and Firefox)
-2. Get the userscript in the list above.
+2. Click on the userscript in the list above.
 3. When prompted, confirm installation.
 
-## How To Uninstall
-Follow the uninstall steps for the browser/extension you're using.
