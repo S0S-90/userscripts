@@ -4,8 +4,8 @@
 // @description  remove ugly orange answering block on e-fellows question and answer page
 // @author       Susanne Sauer
 // @match        https://www.community.e-fellows.net/*
-// @updateURL    https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.meta.js
-// @downloadURL  https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.user.js
+// @updateURL    https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.js
+// @downloadURL  https://github.com/S0S-90/userscripts/raw/master/removeAnswerBox.js
 // ==/UserScript==
 
 (function() {
