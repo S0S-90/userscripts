@@ -172,7 +172,7 @@ function createDropdown(){
     // create and add dropdown menu
     var para = document.createElement("form");
     var text = "<select name=crit><option value='name'>Name</option><option value='jobs'>Jobs</option><option value='proc'>Processors</option></select>";
-    text += "<input type='submit'>";
+    text += "<input type='submit' value='Submit'>"; // value = text written on button
     para.innerHTML = text;
     para.id = "myForm";
     para.addEventListener("submit", updateTable); // function that is executed when submit button is clicked
