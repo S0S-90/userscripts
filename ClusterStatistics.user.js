@@ -189,7 +189,7 @@ function createDropdown(){
 (function() {
     'use strict';
 
-    var savedText = removeNodesAndReservations(); // remove section "Nodes and Reservations
+    removeNodesAndReservations(); // remove section "Nodes and Reservations
     createDropdown(); // create dropdown menu
     getInfoAndCreateTable("name", true); // create first version of table (sorted by name)
 })();
