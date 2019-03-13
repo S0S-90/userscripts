@@ -124,7 +124,7 @@ function sortPeople(people, sortingCriterion){
         people.sort(function(a,b){return b.jobs - a.jobs});
     }
     else if (sortingCriterion == "name"){
-        people.sort(function(a,b){if (a.name >= b.name) return 1; else return -1;});
+        people.sort(function(a,b){if (a.name > b.name) return 1; else return -1;});
     }
     return people;
 }
