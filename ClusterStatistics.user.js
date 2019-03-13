@@ -1,11 +1,19 @@
 // ==UserScript==
 // @name         ClusterStatistics
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  statistics for current cluster usage
 // @author       Susanne Sauer
 // @match        http://132.187.77.27/mauires-bin/mauistatus.pl*
 // ==/UserScript==
+
+// function that removes the section "Nodes and Reservations", including heading
+function removeNodesAndReservations(){
+    var heading = document.getElementsByTagName("h2")[0];
+    heading.outerHTML = "";
+    var table = document.getElementsByClassName("nodealloc")[0];
+    table.outerHTML = "";
+}
 
 // cuts first 2 lines (headings) and last 4 lines (statistics) from table
 function cutTable(tableText){
@@ -124,7 +132,7 @@ function sortPeople(people, sortingCriterion){
         people.sort(function(a,b){return b.jobs - a.jobs});
     }
     else if (sortingCriterion == "name"){
-        people.sort(function(a,b){if (a.name > b.name) return 1; else return -1;});
+        people.sort(function(a,b){if (a.name >= b.name) return 1; else return -1;});
     }
     return people;
 }
@@ -180,6 +188,8 @@ function createDropdown(){
 
 (function() {
     'use strict';
+
+    var savedText = removeNodesAndReservations(); // remove section "Nodes and Reservations
     createDropdown(); // create dropdown menu
     getInfoAndCreateTable("name", true); // create first version of table (sorted by name)
 })();
