@@ -95,7 +95,7 @@ function collectInformationOnJobs(names, jobArrays){
 // creates the text of an html table out of the array 'people'
 function createTableText(people){
     var person;
-    var text = "<tr><th>name</th><th>jobs</th><th>processors</th></tr>";
+    var text = "<tr><th>User</th><th>Jobs</th><th>Processors</th></tr>";
     for (person in people){
         text += "<tr><td>"+people[person].name+"</td><td>"+people[person].jobs+"</td><td>"+people[person].proc+"</td></tr>";
     }
