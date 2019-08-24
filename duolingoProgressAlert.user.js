@@ -7,21 +7,26 @@
 // @match        www.duolingo.com
 // ==/UserScript==
 
+let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
+
 // calculates percentage from circle arc (defined by radius of the cirle r and endpoint P)
 function get_percentage(r, P){
     var alpha = Math.asin(P.x/r);
     if (P.y > 0){
         alpha = Math.PI - alpha;
     }
+    else if (alpha < 0){
+        alpha = 2*Math.PI + alpha;
+    }
     var percent = alpha / (2*Math.PI);
     percent = Math.round(percent*100);
     return percent;
 }
 
-// gets the percentage from a lesson (defined as div-object)
-function get_percentage_from_lesson(lesson){
+// gets the percentage from a skill (defined as div-object)
+function get_percentage_from_skill(skill){
     // get svg path for circle arc
-    var g = lesson.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
+    var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
     var path = g.childNodes[1].getAttribute("d");
     // get relevant information out of path
     var path_array = path.split('L')[0].split(',');
@@ -33,12 +38,44 @@ function get_percentage_from_lesson(lesson){
     return get_percentage(r,endpoint);
 }
 
+// takes an array and creates a new array that consists only of every other element of original array
+function every_second_element(array){
+    var result = Array();
+    for (var i = 0; i < array.length; i+=2){
+        result.push(array[i]);
+    }
+    return result;
+}
+
+// gets all skills from the duolingo tree as an array of div-objects
+function get_all_skills(treename){
+    var tree = document.getElementsByClassName(treename)[0].childNodes[1];
+    var result = Array(); // array of the skills (as div-objects)
+
+    var checkpoints = tree.childNodes; // only every second node consists of lessons
+    checkpoints = every_second_element(checkpoints);
+    for (var checkpoint of checkpoints){
+        var number_of_children = checkpoint.childNodes.length;
+        var rows;
+        if (number_of_children == 1){ // checkpoint already unlocked
+            rows = checkpoint.firstChild.childNodes;
+        }
+        else if (number_of_children == 3){ // checkpoint still locked
+            rows = checkpoint.childNodes[1].childNodes;
+        }
+        else alert("Error: strange number of children for a checkpoint");
+        for (var r of rows){
+            var skills = r.childNodes; // this is a nodeList
+            var skill_array = Array.prototype.slice.call(skills); // convert to array
+            result = result.concat(skill_array);
+        }
+    }
+    return result;
+}
+
 (function() {
     'use strict';
-    var tree = document.getElementsByClassName("i12-l")[0].childNodes[1];
-    var row = tree.firstChild.firstChild.childNodes[1]; // second row (_2GJb6)
-    var lesson = row.childNodes[1]; // second lesson
-    var percentage = get_percentage_from_lesson(lesson);
-
-    alert(percentage);
+    var skills = get_all_skills(K_DUOTREE);
+    alert(skills.length);
+    alert(get_percentage_from_skill(skills[0]));
 })();
