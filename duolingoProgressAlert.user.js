@@ -29,6 +29,9 @@ function get_percentage_from_skill(skill){
     var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
     var path = g.childNodes[1].getAttribute("d");
     // get relevant information out of path
+    if (path.split('L')[1].includes("A") == false){
+        return 0;
+    }
     var path_array = path.split('L')[0].split(',');
     var r = Math.abs(Number(path_array[1].split('A')[0])); // radius
     var x = Number(path_array[path_array.length - 2]);
@@ -36,6 +39,16 @@ function get_percentage_from_skill(skill){
     var endpoint = {"x":x,"y": y}; // endpoint
     // calculate percentage
     return get_percentage(r,endpoint);
+}
+
+// gets name for a skill (defined as div-object)
+function get_skill_name(skill){
+    return skill.firstChild.firstChild.childNodes[1].firstChild.innerHTML;
+}
+
+// gets level from a skill (defined as div-object) which I'm on the way to
+function get_skill_level(skill){
+    return skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes[1].innerHTML;
 }
 
 // takes an array and creates a new array that consists only of every other element of original array
@@ -77,5 +90,11 @@ function get_all_skills(treename){
     'use strict';
     var skills = get_all_skills(K_DUOTREE);
     alert(skills.length);
-    alert(get_percentage_from_skill(skills[0]));
+    for (var skill of skills){
+        var percent = get_percentage_from_skill(skill);
+        var name = get_skill_name(skill);
+        var level = get_skill_level(skill);
+        var skill_info = {"name":name, "progress":percent, "level": level};
+        alert(skill_info.name + ": " + skill_info.progress + "% on the way to level " + skill_info.level);
+    }
 })();
