@@ -117,4 +117,6 @@ function create_skill_info_string(skills_info){
     var skills = get_all_skills(K_DUOTREE);
     var information = get_information_about_skills(skills);
     alert(create_skill_info_string(information));
+    sessionStorage.setItem("info_about_skills", JSON.stringify(information));
+    alert(sessionStorage.getItem("info_about_skills"));
 })();
