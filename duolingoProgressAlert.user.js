@@ -48,6 +48,9 @@ function get_skill_name(skill){
 
 // gets level from a skill (defined as div-object) which I'm on the way to
 function get_skill_level(skill){
+    if (skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes.length == 1){
+        return 1; // skill is still locked so I am on the way to level 1
+    }
     return skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes[1].innerHTML;
 }
 
@@ -86,15 +89,32 @@ function get_all_skills(treename){
     return result;
 }
 
-(function() {
-    'use strict';
-    var skills = get_all_skills(K_DUOTREE);
-    alert(skills.length);
+// collects all relevant information (name, percent, level) of all skills and returns an array with those infos
+// every skill info contains the following attributes: name, progress, level
+function get_information_about_skills(skills){
+    var result = Array();
     for (var skill of skills){
         var percent = get_percentage_from_skill(skill);
         var name = get_skill_name(skill);
         var level = get_skill_level(skill);
         var skill_info = {"name":name, "progress":percent, "level": level};
-        alert(skill_info.name + ": " + skill_info.progress + "% on the way to level " + skill_info.level);
+        result.push(skill_info);
     }
+    return result;
+}
+
+// creates a string for all the information about all the skills (to use as alert)
+function create_skill_info_string(skills_info){
+    var result = String();
+    for (var skill_info of skills_info){
+        result += skill_info.name + ": " + skill_info.progress + "% on the way to level " + skill_info.level + "\n";
+    }
+    return result;
+}
+
+(function() {
+    'use strict';
+    var skills = get_all_skills(K_DUOTREE);
+    var information = get_information_about_skills(skills);
+    alert(create_skill_info_string(information));
 })();
