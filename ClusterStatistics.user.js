@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ClusterStatistics
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.2
 // @description  statistics for current cluster usage
 // @author       Susanne Sauer
 // @match        http://132.187.77.27/mauires-bin/mauistatus.pl*
@@ -32,8 +32,8 @@ function cutTable(tableText){
 function convertToArray(jobStrings){
     var newArray = [];
     var job;
-    for (job in jobStrings){
-        var jobArray = jobStrings[job].split(/\s+/); // this seems to cut at white spaces
+    for (job of jobStrings){
+        var jobArray = job.split(/\s+/); // this seems to cut at white spaces
         newArray.push(jobArray);
     }
     return newArray;
@@ -43,8 +43,8 @@ function convertToArray(jobStrings){
 function collectNames(jobArrays){
     var nameArray = []
     var job;
-    for (job in jobArrays){
-        var name = jobArrays[job][1];
+    for (job of jobArrays){
+        var name = job[1];
         if (!nameArray.includes(name)){
             nameArray.push(name);
         }
@@ -66,24 +66,24 @@ function collectInformationOnJobs(names, jobArrays){
 
     // function that takes a name and returns the index of the corresponding person in array 'people'
     function findPersonByName(n){
-        for (person in people){
-            var personName = people[person].name;
+        for (var [i, person] of people.entries()){
+            var personName = person.name;
             if (n == personName){
-                return person;
+                return i;
             }
         }
     }
 
     // create a person for every name, fill array 'people'
-    for (name in names){
-        var person = {name: names[name], jobs : 0, proc : 0};
+    for (name of names){
+        var person = {name: name, jobs : 0, proc : 0};
         people.push(person);
     }
 
     // goes through jobs and adds jobs and processors to correct person
-    for (job in jobArrays){
-        var currentName = jobArrays[job][1];
-        var currentProc = jobArrays[job][3];
+    for (job of jobArrays){
+        var currentName = job[1];
+        var currentProc = job[3];
         var currentPerson = findPersonByName(currentName);
         people[currentPerson].jobs += 1;
         people[currentPerson].proc += Number(currentProc);
@@ -96,8 +96,8 @@ function collectInformationOnJobs(names, jobArrays){
 function createTableText(people){
     var person;
     var text = "<tr><th>User</th><th>Jobs</th><th>Processors</th></tr>";
-    for (person in people){
-        text += "<tr><td>"+people[person].name+"</td><td>"+people[person].jobs+"</td><td>"+people[person].proc+"</td></tr>";
+    for (person of people){
+        text += "<tr><td>"+person.name+"</td><td>"+person.jobs+"</td><td>"+person.proc+"</td></tr>";
     }
     return text;
 }
