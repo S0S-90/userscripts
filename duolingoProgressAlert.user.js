@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      0.1
+// @version      0.9
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
-// @match        www.duolingo.com
+// @match        www.duolingo.com/*
 // ==/UserScript==
 
 let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
@@ -103,6 +103,26 @@ function get_information_about_skills(skills){
     return result;
 }
 
+// compares two arrays of skill_infos
+// returns empty string if they are equal or not comparable
+// returns information about the changes as string if they are comparable and not equal
+function compare_skill_infos(info_1, info_2){
+    if (info_1.length != info_2.length){ // different number of skills
+        return "";
+    }
+    var result_string = String();
+    for (var [i, inf_a] of info_1.entries()){
+        var inf_b = info_2[i];
+        if (inf_a.name != inf_b.name){ // different name of corresponding skills
+            return "";
+        }
+        if (inf_a.progress != inf_b.progress || inf_a.level != inf_b.level){ // percentage or level has changed
+            result_string += inf_a.name + ": " + inf_a.progress + "% (level " + inf_a.level + ") -> " + inf_b.progress + "% (level " + inf_b.level + ")\n";
+        }
+    }
+    return result_string;
+}
+
 // creates a string for all the information about all the skills (to use as alert)
 function create_skill_info_string(skills_info){
     var result = String();
@@ -114,9 +134,24 @@ function create_skill_info_string(skills_info){
 
 (function() {
     'use strict';
+    alert("duolingoProgressAlert is running");
+
+    // get new information
     var skills = get_all_skills(K_DUOTREE);
-    var information = get_information_about_skills(skills);
-    alert(create_skill_info_string(information));
-    sessionStorage.setItem("info_about_skills", JSON.stringify(information));
-    alert(sessionStorage.getItem("info_about_skills"));
+    var info_new = get_information_about_skills(skills);
+
+    // get old information
+    var old_json = sessionStorage.getItem("info_about_skills");
+    if (old_json != null){
+        var info_old = JSON.parse(old_json);
+
+        // compare them
+        var compare_string = compare_skill_infos(info_old, info_new);
+        if (compare_string != ""){
+            alert("You made progress in the following skills:\n" + compare_string);
+        }
+    }
+
+    // save new information
+    sessionStorage.setItem("info_about_skills", JSON.stringify(info_new));
 })();
