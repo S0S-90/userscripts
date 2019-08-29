@@ -132,9 +132,24 @@ function create_skill_info_string(skills_info){
     return result;
 }
 
+
+
 (function() {
     'use strict';
-    alert("duolingoProgressAlert is running");
+    alert("duolingoProgressAlert start");
+    var location_old = window.location.pathname;
+
+    alert(location_old);
+    if (location_old == "/") alert("Strings are identical");
+    else alert("Strings are not identical");
+
+    function update()
+{
+    //alert(window.location.pathname + location_old);
+
+    if (window.location.pathname == "/" && location_old != "/")
+    {
+    alert("duolingoProgressAlert update");
 
     // get new information
     var skills = get_all_skills(K_DUOTREE);
@@ -142,6 +157,7 @@ function create_skill_info_string(skills_info){
 
     // get old information
     var old_json = sessionStorage.getItem("info_about_skills");
+        alert(old_json);
     if (old_json != null){
         var info_old = JSON.parse(old_json);
 
@@ -154,4 +170,16 @@ function create_skill_info_string(skills_info){
 
     // save new information
     sessionStorage.setItem("info_about_skills", JSON.stringify(info_new));
+    }
+    location_old = window.location.pathname;
+}
+
+    // get and save information when reaching site
+    var skills = get_all_skills(K_DUOTREE);
+    var info = get_information_about_skills(skills);
+    sessionStorage.setItem("info_about_skills", JSON.stringify(info));
+
+    // run real program when something in the tree changes
+    var observer = new MutationObserver(update);
+    observer.observe(document.body, {subtree : true, childList : true});
 })();
