@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      0.9
+// @version      1.0
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        www.duolingo.com/*
@@ -9,8 +9,14 @@
 
 let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
 
+
+// STUFF TO GET INFORMATION ABOUT THE SKILL TREE
+// THIS INFORMATION IS SAVED IN AN ARRAY OF OBJECTS WHICH REPRESENT THE SINGLE SKILLS
+// EVERY SKILL CONTAINS THE ATTRIBUTES: NAME, PROGRESS, LEVEL
+
 // calculates percentage from circle arc (defined by radius of the cirle r and endpoint P)
-function get_percentage(r, P){
+function get_percentage(r, P)
+{
     var alpha = Math.asin(P.x/r);
     if (P.y > 0){
         alpha = Math.PI - alpha;
@@ -24,7 +30,8 @@ function get_percentage(r, P){
 }
 
 // gets the percentage from a skill (defined as div-object)
-function get_percentage_from_skill(skill){
+function get_percentage_from_skill(skill)
+{
     // get svg path for circle arc
     var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
     var path = g.childNodes[1].getAttribute("d");
@@ -47,7 +54,8 @@ function get_skill_name(skill){
 }
 
 // gets level from a skill (defined as div-object) which I'm on the way to
-function get_skill_level(skill){
+function get_skill_level(skill)
+{
     if (skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes.length == 1){
         return 1; // skill is still locked so I am on the way to level 1
     }
@@ -55,7 +63,8 @@ function get_skill_level(skill){
 }
 
 // takes an array and creates a new array that consists only of every other element of original array
-function every_second_element(array){
+function every_second_element(array)
+{
     var result = Array();
     for (var i = 0; i < array.length; i+=2){
         result.push(array[i]);
@@ -64,7 +73,8 @@ function every_second_element(array){
 }
 
 // gets all skills from the duolingo tree as an array of div-objects
-function get_all_skills(treename){
+function get_all_skills(treename)
+{
     var tree = document.getElementsByClassName(treename)[0].childNodes[1];
     var result = Array(); // array of the skills (as div-objects)
 
@@ -91,7 +101,8 @@ function get_all_skills(treename){
 
 // collects all relevant information (name, percent, level) of all skills and returns an array with those infos
 // every skill info contains the following attributes: name, progress, level
-function get_information_about_skills(skills){
+function get_information_about_skills(skills)
+{
     var result = Array();
     for (var skill of skills){
         var percent = get_percentage_from_skill(skill);
@@ -103,10 +114,15 @@ function get_information_about_skills(skills){
     return result;
 }
 
+// HERE THE STUFF TO GET THE TREE INFORMAION ENDS
+// NOW WE HAVE TO WORK WITH IT
+
+
 // compares two arrays of skill_infos
 // returns empty string if they are equal or not comparable
 // returns information about the changes as string if they are comparable and not equal
-function compare_skill_infos(info_1, info_2){
+function compare_skill_infos(info_1, info_2)
+{
     if (info_1.length != info_2.length){ // different number of skills
         return "";
     }
@@ -123,56 +139,46 @@ function compare_skill_infos(info_1, info_2){
     return result_string;
 }
 
-// creates a string for all the information about all the skills (to use as alert)
-function create_skill_info_string(skills_info){
-    var result = String();
-    for (var skill_info of skills_info){
-        result += skill_info.name + ": " + skill_info.progress + "% on the way to level " + skill_info.level + "\n";
+// function that is called everytime when something on the site changes
+function update()
+{
+    // some variables that are filled during has_progressed() function
+    var current_info; // information about current tree
+    var compare_string; // string that compares current information to old one
+
+    // function that looks if tree progress has changed, returns true if yes and false if no
+    // furthermore it filled current information into 'current_info' and a string with the differences into 'compare_string'
+    function has_progressed() {
+        // get new information
+        var skills = get_all_skills(K_DUOTREE);
+        current_info = get_information_about_skills(skills);
+
+        // get old information
+        var old_json = sessionStorage.getItem("info_about_skills");
+
+        // compare old and new information
+        if (old_json != null){
+            var info_old = JSON.parse(old_json);
+            compare_string = compare_skill_infos(info_old, current_info);
+            if (compare_string == "") return false;
+            else return true;
+        }
+        else return false;
     }
-    return result;
+
+    // this is what is done in update()
+    if (window.location.pathname == "/") // only on main page (www.duolingo.com/)
+    {
+        if (has_progressed()) // if there is some progress on the tree: print and save information
+        {
+            alert("You made progress in the following skills:\n" + compare_string);
+            sessionStorage.setItem("info_about_skills", JSON.stringify(current_info));
+        }
+    }
 }
-
-
 
 (function() {
     'use strict';
-    alert("duolingoProgressAlert start");
-    var location_old = window.location.pathname;
-
-    alert(location_old);
-    if (location_old == "/") alert("Strings are identical");
-    else alert("Strings are not identical");
-
-    function update()
-{
-    //alert(window.location.pathname + location_old);
-
-    if (window.location.pathname == "/" && location_old != "/")
-    {
-    alert("duolingoProgressAlert update");
-
-    // get new information
-    var skills = get_all_skills(K_DUOTREE);
-    var info_new = get_information_about_skills(skills);
-
-    // get old information
-    var old_json = sessionStorage.getItem("info_about_skills");
-        alert(old_json);
-    if (old_json != null){
-        var info_old = JSON.parse(old_json);
-
-        // compare them
-        var compare_string = compare_skill_infos(info_old, info_new);
-        if (compare_string != ""){
-            alert("You made progress in the following skills:\n" + compare_string);
-        }
-    }
-
-    // save new information
-    sessionStorage.setItem("info_about_skills", JSON.stringify(info_new));
-    }
-    location_old = window.location.pathname;
-}
 
     // get and save information when reaching site
     var skills = get_all_skills(K_DUOTREE);
