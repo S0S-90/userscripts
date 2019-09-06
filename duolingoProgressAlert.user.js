@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.1
+// @version      1.1.1
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
-// @match        www.duolingo.com/*
+// @match        http*://www.duolingo.com/*
 // ==/UserScript==
 
 let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
@@ -33,7 +33,7 @@ function get_percentage(r, P)
 function get_percentage_from_skill(skill)
 {
     // get svg path for circle arc
-    var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
+    var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
     var path = g.childNodes[1].getAttribute("d");
     // get relevant information out of path
     if (path.split('L')[1].includes("A") == false){
@@ -50,16 +50,16 @@ function get_percentage_from_skill(skill)
 
 // gets name for a skill (defined as div-object)
 function get_skill_name(skill){
-    return skill.firstChild.firstChild.childNodes[1].firstChild.innerHTML;
+    return skill.firstChild.firstChild.firstChild.childNodes[1].firstChild.innerHTML;
 }
 
 // gets level from a skill (defined as div-object)
 function get_skill_level(skill)
 {
-    if (skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes.length == 1){
+    if (skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes.length == 1){
         return 0; // skill is still locked so I am on level 0
     }
-    return skill.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes[1].innerHTML;
+    return skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes[1].innerHTML;
 }
 
 // takes an array and creates a new array that consists only of every other element of original array
