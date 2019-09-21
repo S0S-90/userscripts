@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.2
+// @version      1.2.1
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -170,7 +170,7 @@ function update()
     }
 
     // this is what is done in update()
-    if (window.location.pathname == "/") // only on main page (www.duolingo.com/)
+    if (window.location.pathname == "/learn") // only on tree page (www.duolingo.com/learn)
     {
         if (has_progressed()) // if there is some progress on the tree: print and save information
         {
