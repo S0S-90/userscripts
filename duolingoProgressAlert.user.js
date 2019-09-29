@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.2.1
+// @version      1.2.2
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -59,10 +59,10 @@ function get_skill_name(skill){
 // gets level from a skill (defined as div-object)
 function get_skill_level(skill)
 {
-    if (skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes.length == 1){
+    if (skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[2].childNodes.length == 1){
         return 0; // skill is still locked so I am on level 0
     }
-    return skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1].childNodes[1].childNodes[1].innerHTML;
+    return skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[2].childNodes[1].innerHTML;
 }
 
 // takes an array and creates a new array that consists only of every other element of original array
