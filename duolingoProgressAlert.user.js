@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.2.2
+// @version      1.2.3
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -34,7 +34,7 @@ function get_percentage_from_skill(skill)
 {
     // get svg path for circle arc
     var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild;
-    var path = g.childNodes[1].getAttribute("d");
+    var path = g.firstChild.firstChild.getAttribute("d");
     // get relevant information out of path
     if (path.includes('L') == false){
         return 100;
@@ -109,8 +109,11 @@ function get_information_about_skills(skills)
     var result = Array();
     for (var skill of skills){
         var percent = get_percentage_from_skill(skill);
+        //alert(percent);
         var name = get_skill_name(skill);
+        //alert(name);
         var level = get_skill_level(skill);
+        //alert(level);
         var skill_info = {"name":name, "progress":percent, "level": level};
         result.push(skill_info);
     }
