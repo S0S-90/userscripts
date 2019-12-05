@@ -177,7 +177,7 @@ function update()
     {
         if (has_progressed()) // if there is some progress on the tree: print and save information
         {
-            alert("You made progress in the following skills:\n" + compare_string);
+            confirm("You made progress in the following skills:\n" + compare_string);
             sessionStorage.setItem("info_about_skills", JSON.stringify(current_info));
         }
     }
