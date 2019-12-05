@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.2.4
+// @version      1.3
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
