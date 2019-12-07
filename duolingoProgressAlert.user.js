@@ -8,6 +8,7 @@
 // ==/UserScript==
 
 let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
+let K_SIDEBAR = "_2_lzu" // classname of the sidebar (does not exist if window too small)
 
 
 // STUFF TO GET INFORMATION ABOUT THE SKILL TREE
@@ -139,10 +140,19 @@ function compare_skill_infos(info_1, info_2)
             return "";
         }
         if (inf_a.progress != inf_b.progress || inf_a.level != inf_b.level){ // percentage or level has changed
-            result_string += inf_a.name + ": " + inf_a.progress + "% (level " + inf_a.level + ") -> " + inf_b.progress + "% (level " + inf_b.level + ")\n";
+            result_string += "<p>" + inf_a.name + ": " + inf_a.progress + "% (level " + inf_a.level + ") -> " + inf_b.progress + "% (level " + inf_b.level + ")<\p>";
         }
     }
     return result_string;
+}
+
+// function that creates a new element <p> on the sidebar and prints text on it
+function print_text_on_sidebar(text){
+    var para = document.createElement("p");
+    para.innerHTML = text;
+    para.id = "progress_info";
+    var element = document.getElementsByClassName(K_SIDEBAR)[0]; // TODO: first check if this exists!!!
+    element.insertBefore(para, element.firstChild)
 }
 
 // function that is called everytime when something on the site changes
@@ -177,7 +187,7 @@ function update()
     {
         if (has_progressed()) // if there is some progress on the tree: print and save information
         {
-            confirm("You made progress in the following skills:\n" + compare_string);
+            print_text_on_sidebar("<p>You made progress in the following skills:<\p>" + compare_string);
             sessionStorage.setItem("info_about_skills", JSON.stringify(current_info));
         }
     }
