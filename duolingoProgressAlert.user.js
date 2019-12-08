@@ -146,50 +146,38 @@ function compare_skill_infos(info_1, info_2)
     return result_string;
 }
 
-// function that creates a new element <p> on the sidebar and prints text on it
-function print_text_on_sidebar(text){
-    var para = document.createElement("p");
-    para.innerHTML = text;
-    para.id = "progress_info";
-    var element = document.getElementsByClassName(K_SIDEBAR)[0]; // TODO: first check if this exists!!!
-    element.insertBefore(para, element.firstChild)
+// function that resets the stored info to the current progress of the tree
+// furthermore it removes the printed information on site and the reset button
+function reset_skills_info(){
+    var skills = get_all_skills(K_DUOTREE);
+    var info = get_information_about_skills(skills);
+    sessionStorage.setItem("info_about_skills", JSON.stringify(info));
+    document.getElementById("progress_info").outerHTML = "";
+    document.getElementById("reset_button").outerHTML = "";
 }
 
-// function that is called everytime when something on the site changes
-function update()
-{
-    // some variables that are filled during has_progressed() function
-    var current_info; // information about current tree
-    var compare_string; // string that compares current information to old one
-
-    // function that looks if tree progress has changed, returns true if yes and false if no
-    // furthermore it filled current information into 'current_info' and a string with the differences into 'compare_string'
-    function has_progressed() {
-        // get new information
-        var skills = get_all_skills(K_DUOTREE);
-        current_info = get_information_about_skills(skills);
-
-        // get old information
-        var old_json = sessionStorage.getItem("info_about_skills");
-
-        // compare old and new information
-        if (old_json != null){
-            var info_old = JSON.parse(old_json);
-            compare_string = compare_skill_infos(info_old, current_info);
-            if (compare_string == "") return false;
-            else return true;
-        }
-        else return false;
+// function that creates a new element <p> on the sidebar and prints text on it
+function print_text_on_sidebar(text){
+    if (!!document.getElementById("progress_info")){ // if there is already something written: do not overwrite but only add text
+        // TODO: überprüfen, ob ein Skill bereits erwähnt ist, falls ja, diesen ersetzen, statt zu ergänzen
+        var element = document.getElementById("progress_info");
+        var former_text = element.innerHTML;
+        element.innerHTML = former_text + text;
     }
+    else if (document.getElementsByClassName(K_SIDEBAR).length != 0) { // if sidebar exists
+        // create text field with progress information
+        var para = document.createElement("p");
+        para.innerHTML = "<p>You made progress in the following skills:<\p>" + text;
+        para.id = "progress_info";
+        element = document.getElementsByClassName(K_SIDEBAR)[0];
+        element.insertBefore(para, element.firstChild)
 
-    // this is what is done in update()
-    if (window.location.pathname == "/learn") // only on tree page (www.duolingo.com/learn)
-    {
-        if (has_progressed()) // if there is some progress on the tree: print and save information
-        {
-            print_text_on_sidebar("<p>You made progress in the following skills:<\p>" + compare_string);
-            sessionStorage.setItem("info_about_skills", JSON.stringify(current_info));
-        }
+        // create button to reset (calls above function)
+        var button = document.createElement("button");
+        button.innerHTML = "Reset Progress";
+        button.onclick = reset_skills_info;
+        button.id = "reset_button";
+        element.insertBefore(button, element.childNodes[1]);
     }
 }
 
@@ -204,4 +192,50 @@ function update()
     // run real program when something in the tree changes
     var observer = new MutationObserver(update);
     observer.observe(document.body, {subtree : true, childList : true});
+
+    // function that is called everytime when something on the site changes
+    var printed_info = info; // take track of info that has already written during update function
+    function update()
+    {
+        // some variables that are filled during has_progressed() function
+        var current_info; // information about current tree
+        var compare_string; // string that compares current information to old one
+
+        // function that looks if tree progress has changed, returns true if yes and false if no
+        // furthermore it filled current information into 'current_info' and a string with the differences into 'compare_string'
+        function has_progressed() {
+            // get new information
+            var skills = get_all_skills(K_DUOTREE);
+            current_info = get_information_about_skills(skills);
+
+            // get old information
+            var old_json = sessionStorage.getItem("info_about_skills");
+
+            // compare old and new information
+            if (old_json != null){
+                var info_old = JSON.parse(old_json);
+                compare_string = compare_skill_infos(info_old, current_info);
+                if (compare_string == "") return false; // no difference
+                else{
+                    if (JSON.stringify(current_info) == JSON.stringify(printed_info)){
+                        return false; // info has already printed
+                    }
+                    else{
+                        printed_info = current_info;
+                        return true; // print info
+                    }
+                }
+            }
+            else return false; // no info about before status
+        }
+
+        // this is what is done in update()
+        if (window.location.pathname == "/learn") // only on tree page (www.duolingo.com/learn)
+        {
+            if (has_progressed()) // if there is some progress on the tree: print and save information
+            {
+                print_text_on_sidebar(compare_string);
+            }
+        }
+    }
 })();
