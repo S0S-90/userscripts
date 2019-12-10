@@ -239,7 +239,7 @@ function main() {
             }
         }
     }
-};
+}
 
 // run script only when page has loaded completely
 window.addEventListener('load', function() {
