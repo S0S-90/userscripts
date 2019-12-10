@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.3
+// @version      1.4
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -181,7 +181,8 @@ function print_text_on_sidebar(text){
     }
 }
 
-(function() {
+// this is the main function of the script
+function main() {
     'use strict';
 
     // get and save information when reaching site
@@ -238,4 +239,9 @@ function print_text_on_sidebar(text){
             }
         }
     }
-})();
+};
+
+// run script only when page has loaded completely
+window.addEventListener('load', function() {
+    main();
+}, false);
