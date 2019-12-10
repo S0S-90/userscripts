@@ -195,7 +195,7 @@ function main() {
     // run real program when something in the tree changes
     var observer = new MutationObserver(update);
     observer.observe(document.body, {subtree : true, childList : true});
-};
+}
 
 // run script only when page has loaded completely
 window.addEventListener('load', function() {
