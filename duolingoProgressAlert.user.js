@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      1.4
+// @version      2.0
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -156,13 +156,42 @@ function reset_skills_info(){
     document.getElementById("reset_button").outerHTML = "";
 }
 
+// function to print info for skills when there are some skills several times
+// in this case the newer info about this skill is printed
+function update_printed_skill_info(text_before, new_text){
+    var lines_before = text_before.split("<p>");
+    var lines_new = new_text.split("<p>");
+
+    var total_lines = [];
+    for (var line of lines_before){
+        var found = false;
+        for (var [i,line_new] of lines_new.entries()){
+            if (line.split(':').length != 0 && line_new.split(':').length != 0){ // otherwise next line won't work
+                if (line.split(':')[0] == line_new.split(':')[0]){ // same skill
+                    total_lines.push(line_new); // add more recent version of skill to total_lines
+                    lines_new.splice(i,1); // remove line_new from lines_new
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found){
+            total_lines.push(line); // add lines before that were not overwritten to total_lines
+        }
+    }
+    for (line_new of lines_new){
+        total_lines.push(line_new); // add new lines that did not overwrite an old line
+    }
+
+    return total_lines.join("<p>");
+}
+
 // function that creates a new element <p> on the sidebar and prints text on it
 function print_text_on_sidebar(text){
     if (!!document.getElementById("progress_info")){ // if there is already something written: do not overwrite but only add text
-        // TODO: überprüfen, ob ein Skill bereits erwähnt ist, falls ja, diesen ersetzen, statt zu ergänzen
         var element = document.getElementById("progress_info");
         var former_text = element.innerHTML;
-        element.innerHTML = former_text + text;
+        element.innerHTML = update_printed_skill_info(former_text, text);
     }
     else if (document.getElementsByClassName(K_SIDEBAR).length != 0) { // if sidebar exists
         // create text field with progress information
