@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      2.0
+// @version      2.0.1
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
@@ -34,7 +34,7 @@ function get_percentage(r, P)
 function get_percentage_from_skill(skill)
 {
     // get svg path for circle arc
-    var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1];
+    var g = skill.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[1];
     var path = g.childNodes[2].getAttribute("d");
     // get relevant information out of path
     if (path.includes('L') == false){
@@ -54,16 +54,16 @@ function get_percentage_from_skill(skill)
 
 // gets name for a skill (defined as div-object)
 function get_skill_name(skill){
-    return skill.firstChild.firstChild.firstChild.childNodes[1].firstChild.innerHTML;
+    return skill.firstChild.firstChild.childNodes[1].innerHTML;
 }
 
 // gets level from a skill (defined as div-object)
 function get_skill_level(skill)
 {
-    if (skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[2].childNodes.length == 1){
+    if (skill.firstChild.firstChild.firstChild.firstChild.childNodes[2].firstChild.childNodes.length == 1){
         return 0; // skill is still locked so I am on level 0
     }
-    return skill.firstChild.firstChild.firstChild.firstChild.firstChild.childNodes[2].childNodes[1].innerHTML;
+    return skill.firstChild.firstChild.firstChild.firstChild.childNodes[2].firstChild.childNodes[1].innerHTML;
 }
 
 // takes an array and creates a new array that consists only of every other element of original array
@@ -109,7 +109,7 @@ function get_information_about_skills(skills)
 {
     var result = Array();
     for (var skill of skills){
-        var percent = get_percentage_from_skill(skill);
+        var percent = get_percentage_from_skill(skill)
         //alert(percent);
         var name = get_skill_name(skill);
         //alert(name);
