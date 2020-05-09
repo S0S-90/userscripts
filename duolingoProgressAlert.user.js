@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         duolingoProgressAlert
 // @namespace    http://tampermonkey.net/
-// @version      2.0.1
+// @version      2.0.2
 // @description  shows progress of each lesson after a practice session
 // @author       Susanne Sauer
 // @match        http*://www.duolingo.com/*
 // ==/UserScript==
 
-let K_DUOTREE = "i12-l"; // classname of tree (taken from userscript duolingonextlesson)
-let K_SIDEBAR = "_2_lzu" // classname of the sidebar (does not exist if window too small)
+let K_SIDEBAR = "_3Nl60" // classname of the sidebar (does not exist if window too small)
 
 
 // STUFF TO GET INFORMATION ABOUT THE SKILL TREE
@@ -76,33 +75,6 @@ function every_second_element(array)
     return result;
 }
 
-// gets all skills from the duolingo tree as an array of div-objects
-function get_all_skills(treename)
-{
-    var tree = document.getElementsByClassName(treename)[0].childNodes[1];
-    var result = Array(); // array of the skills (as div-objects)
-
-    var checkpoints = tree.childNodes; // only every second node consists of lessons
-    checkpoints = every_second_element(checkpoints);
-    for (var checkpoint of checkpoints){
-        var number_of_children = checkpoint.childNodes.length;
-        var rows;
-        if (number_of_children == 1){ // checkpoint already unlocked
-            rows = checkpoint.firstChild.childNodes;
-        }
-        else if (number_of_children == 3){ // checkpoint still locked
-            rows = checkpoint.childNodes[1].childNodes;
-        }
-        else alert("Error: strange number of children for a checkpoint");
-        for (var r of rows){
-            var skills = r.childNodes; // this is a nodeList
-            var skill_array = Array.prototype.slice.call(skills); // convert to array
-            result = result.concat(skill_array);
-        }
-    }
-    return result;
-}
-
 // collects all relevant information (name, percent, level) of all skills and returns an array with those infos
 // every skill info contains the following attributes: name, progress, level
 function get_information_about_skills(skills)
@@ -149,7 +121,7 @@ function compare_skill_infos(info_1, info_2)
 // function that resets the stored info to the current progress of the tree
 // furthermore it removes the printed information on site and the reset button
 function reset_skills_info(){
-    var skills = get_all_skills(K_DUOTREE);
+    var skills = document.querySelectorAll("[data-test='skill']");
     var info = get_information_about_skills(skills);
     sessionStorage.setItem("info_about_skills", JSON.stringify(info));
     document.getElementById("progress_info").outerHTML = "";
@@ -215,7 +187,7 @@ function main() {
     'use strict';
 
     // get and save information when reaching site
-    var skills = get_all_skills(K_DUOTREE);
+    var skills = document.querySelectorAll("[data-test='skill']");
     var info = get_information_about_skills(skills);
     sessionStorage.setItem("info_about_skills", JSON.stringify(info));
 
@@ -235,7 +207,7 @@ function main() {
         // furthermore it filled current information into 'current_info' and a string with the differences into 'compare_string'
         function has_progressed() {
             // get new information
-            var skills = get_all_skills(K_DUOTREE);
+            var skills = document.querySelectorAll("[data-test='skill']");
             current_info = get_information_about_skills(skills);
 
             // get old information
