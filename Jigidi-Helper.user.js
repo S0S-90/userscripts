@@ -1,31 +1,78 @@
 // ==UserScript==
 // @name         Jigidi-Helper
-// @version      1.0
+// @version      2.0
+// @author       Susanne Sauer
 // @description  Help solving jigidi puzzles by coloring and numbering them (modified from https://gist.github.com/Dan-Q/e9bfe5c2ca4b13fae4994c5e84685761)
 // @match        https://www.jigidi.com/solve/*
 // ==/UserScript==
 
+// function to create an array of color strings in RGB code, representing a rainbow
+// for more information see here: https://krazydad.com/tutorials/makecolors.php
+function make_rainbow(length, phase=2*Math.PI/3, offset=0)
+{
+    // phaseShift = 120° (rainbow)
+    var phase1 = offset;
+    var phase2 = phase + offset;
+    var phase3 = 2*phase + offset;
+
+    // width and center are ~255/2 (color space)
+    var center = 128;
+    var width = 127;
+
+    // frequency of the rainbow (0.1 for length=50)
+    var frequency = 5/length;
+
+    // function copied from https://krazydad.com/tutorials/makecolors.php
+    function byte2Hex(n) {
+        var nybHexString = "0123456789ABCDEF";
+        return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+    }
+
+    // function copied from https://krazydad.com/tutorials/makecolors.php
+    function RGB2Color(r,g,b) {
+        return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+    }
+
+    // create colorstrings
+    var rainbow = [];
+    for (var i = 0; i < length; ++i)
+    {
+        var red = Math.sin(frequency*i+phase1) * width + center;
+        var green = Math.sin(frequency*i+phase2) * width + center;
+        var blue = Math.sin(frequency*i+phase3) * width + center;
+        rainbow.push(RGB2Color(red,green,blue));
+    }
+    return rainbow;
+}
+
 (function() {
     'use strict';
 
-    window.jColors = ['red', 'blue', 'brown', 'orange', 'yellow', 'pink', 'lightblue', 'lightgreen', 'lightgray'];
-    window.lColors = ['white', 'black', 'purple', 'darkgray', '#009'];
-    window.lWidths = [5, 10, 20];
-    window.jCols = parseInt(document.getElementById('info-creator').innerText.match(/(\d+)×/)[1]);
-    window.jC = 0;
-    CanvasRenderingContext2D.prototype.putImageData = function(imageData, dx, dy){
-        const col = window.jC % window.jCols;
-        const row = Math.floor(window.jC / window.jCols);
+    window.jCols = parseInt(document.getElementById('info-creator').innerText.match(/(\d+)×/)[1]); // get number of cols
+    window.jColors = make_rainbow(window.jCols); // column colors
+
+    window.jRows = parseInt(document.getElementById('info-creator').innerText.match(/(\d+)×/)[1]); // get number of rows
+    window.lColors = make_rainbow(window.jRows, 0, Math.PI/2); // line colors (greyscale)
+    window.lWidth = 20; // line width
+
+    window.jC = 0; // variable to increment
+    CanvasRenderingContext2D.prototype.putImageData = function(imageData, dx, dy) // for every piece
+    {
+        // set background color by coloumn
+        const col = window.jC % window.jCols; // col number
         this.fillStyle = window.jColors[col % window.jColors.length];
         this.fillRect(-1000,-1000,2000,2000);
-        if(0 == (row % 2)){ this.fillStyle = '#ffffff33'; this.fillRect(-1000,-1000,2000,2000); }
+
+        // set line number by row
+        const row = Math.floor(window.jC / window.jCols); // row number
         this.fillStyle = window.lColors[row % window.lColors.length];
-        this.fillRect(-1000, -35, 2000, window.lWidths[row % window.lWidths.length]);
-        this.fillStyle = window.lColors[col % window.lColors.length];
-        this.fillRect(-35, -1000, window.lWidths[col % window.lWidths.length], 2000);
+        this.fillRect(-1000, -35, 2000, window.lWidth);
+
+        // add text
         this.font = 'bold 14px sans-serif';
         this.fillStyle = 'black';
         this.fillText(`${row+1},${col+1}`, -5, 0);
+
         window.jC++;
     }
 })();
