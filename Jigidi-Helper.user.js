@@ -1,19 +1,31 @@
 // ==UserScript==
 // @name         Jigidi-Helper
-// @version      2.0
+// @version      2.1
 // @author       Susanne Sauer
 // @description  Help solving jigidi puzzles by coloring and numbering them (modified from https://gist.github.com/Dan-Q/e9bfe5c2ca4b13fae4994c5e84685761)
 // @match        https://www.jigidi.com/solve/*
 // ==/UserScript==
 
+
+// create hexstring for color from single values (red, green, blue)
+// copied from https://krazydad.com/tutorials/makecolors.php
+function RGB2Color(r,g,b)
+{
+    function byte2Hex(n) {
+        var nybHexString = "0123456789ABCDEF";
+        return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+    }
+    return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+}
+
 // function to create an array of color strings in RGB code, representing a rainbow
 // for more information see here: https://krazydad.com/tutorials/makecolors.php
-function make_rainbow(length, phase=2*Math.PI/3, offset=0)
+function make_rainbow(length)
 {
     // phaseShift = 120° (rainbow)
-    var phase1 = offset;
-    var phase2 = phase + offset;
-    var phase3 = 2*phase + offset;
+    var phase1 = 0;
+    var phase2 = 2*Math.PI/3;
+    var phase3 = 4*Math.PI/3;
 
     // width and center are ~255/2 (color space)
     var center = 128;
@@ -21,17 +33,6 @@ function make_rainbow(length, phase=2*Math.PI/3, offset=0)
 
     // frequency of the rainbow (0.1 for length=50)
     var frequency = 5/length;
-
-    // function copied from https://krazydad.com/tutorials/makecolors.php
-    function byte2Hex(n) {
-        var nybHexString = "0123456789ABCDEF";
-        return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
-    }
-
-    // function copied from https://krazydad.com/tutorials/makecolors.php
-    function RGB2Color(r,g,b) {
-        return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
-    }
 
     // create colorstrings
     var rainbow = [];
@@ -45,14 +46,28 @@ function make_rainbow(length, phase=2*Math.PI/3, offset=0)
     return rainbow;
 }
 
+// function to create an array of color strings in RGB code, representing a greyscale
+function make_greyscale(length)
+{
+    var step = 255/(length-1);
+
+    var greyscale = [];
+    for (var i = 0; i < length; ++i)
+    {
+        var value = i*step;
+        greyscale.push(RGB2Color(value, value, value));
+    }
+    return greyscale.reverse();
+}
+
 (function() {
     'use strict';
 
     window.jCols = parseInt(document.getElementById('info-creator').innerText.match(/(\d+)×/)[1]); // get number of cols
     window.jColors = make_rainbow(window.jCols); // column colors
 
-    window.jRows = parseInt(document.getElementById('info-creator').innerText.match(/(\d+)×/)[1]); // get number of rows
-    window.lColors = make_rainbow(window.jRows, 0, Math.PI/2); // line colors (greyscale)
+    window.jRows = parseInt(document.getElementById('info-creator').innerText.match(/×(\d+)/)[1]); // get number of rows
+    window.lColors = make_greyscale(window.jRows); // line colors
     window.lWidth = 20; // line width
 
     window.jC = 0; // variable to increment
