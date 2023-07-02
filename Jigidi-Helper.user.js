@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Jigidi-Helper
-// @version      2.2
+// @version      2.3
 // @author       Susanne Sauer
 // @description  Help solving jigidi puzzles by coloring and numbering them (modified from https://gist.github.com/Dan-Q/e9bfe5c2ca4b13fae4994c5e84685761)
 // @match        https://www.jigidi.com/solve/*
@@ -94,10 +94,10 @@ function make_greyscale(length)
         this.fillStyle = background_color;
         this.fillRect(-1000,-1000,2000,2000);
 
-        // set line number by row
+        // set line color by row
         const row = Math.floor(window.jC / window.jCols); // row number
         this.fillStyle = window.lColors[row % window.lColors.length];
-        this.fillRect(-1000, -35, 2000, window.lWidth);
+        this.fillRect(-500, 50, 2000, window.lWidth);
 
         // add text where text color is determined by background color
         this.font = 'bold 14px sans-serif';
@@ -107,7 +107,7 @@ function make_greyscale(length)
         else {
             this.fillStyle = 'white';
         }
-        this.fillText(`${row+1},${col+1}`, -5, 0);
+        this.fillText(`${row+1},${col+1}`, 25, 50);
 
         window.jC++;
     }
